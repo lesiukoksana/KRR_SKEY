@@ -9,7 +9,6 @@ class User(db.Model):
     secret = db.Column(db.String(120), nullable=False)
 
     def generate_one_time_passwords(self, n):
-        """Генерація n одноразових паролів на основі хешування."""
         passwords = []
         current_secret = self.secret
         for i in range(n):
