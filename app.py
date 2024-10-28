@@ -1,6 +1,6 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from models import db, User
-import pyotp
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -18,7 +18,7 @@ def index():
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
-    secret = pyotp.random_base32()
+    secret = os.urandom(16).hex()  # Генерація випадкового секрету
     new_user = User(username=username, secret=secret)
     db.session.add(new_user)
     db.session.commit()
@@ -31,9 +31,8 @@ def generate_otp():
         username = request.form['username']
         user = User.query.filter_by(username=username).first()
         if user:
-            totp = pyotp.TOTP(user.secret)
-            otp = totp.now()
-            flash(f'OTP для користувача {username}: {otp}')
+            passwords = user.generate_one_time_passwords(5)  # Генерація 5 паролів
+            flash(f'One-time passwords for {username}: {passwords}')
             return redirect(url_for('index'))
         flash('User not found.')
     return render_template('generate_otp.html')
@@ -45,8 +44,9 @@ def authenticate():
     user = User.query.filter_by(username=username).first()
     
     if user:
-        totp = pyotp.TOTP(user.secret)
-        if totp.verify(password):
+        # Генерація паролів для перевірки
+        passwords = user.generate_one_time_passwords(5)  # Генерація 5 паролів
+        if password in passwords:
             flash("Authenticated successfully!")
             return redirect(url_for('index'))
     flash("Authentication failed.")
@@ -54,4 +54,3 @@ def authenticate():
 
 if __name__ == '__main__':
     app.run(debug=True)
-

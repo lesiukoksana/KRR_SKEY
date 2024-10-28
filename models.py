@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from hashlib import sha256
-import os
 
 db = SQLAlchemy()
 
@@ -9,7 +8,11 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     secret = db.Column(db.String(120), nullable=False)
 
-    def generate_one_time_password(self, n):
+    def generate_one_time_passwords(self, n):
+        """Генерація n одноразових паролів на основі хешування."""
+        passwords = []
+        current_secret = self.secret
         for i in range(n):
-            self.secret = sha256((self.secret + str(i)).encode()).hexdigest()
-        return self.secret
+            current_secret = sha256((current_secret + str(i)).encode()).hexdigest()
+            passwords.append(current_secret)
+        return passwords
