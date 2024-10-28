@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S/Key Authentication</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Реєстрація</h1>
+    <form action="/register" method="POST">
+        <input type="text" name="username" placeholder="Користувач" required>
+        <button type="submit">Зареєструватися</button>
+    </form>
+
+    <h1>Аутентифікація</h1>
+    <form action="/authenticate" method="POST">
+        <input type="text" name="username" placeholder="Користувач" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit">Увійти</button>
+    </form>
+
+    <a href="{{ url_for('generate_otp') }}">Отримати OTP</a>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>
