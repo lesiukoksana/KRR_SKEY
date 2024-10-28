@@ -18,7 +18,7 @@ def index():
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
-    secret = os.urandom(16).hex()  # Генерація випадкового секрету
+    secret = os.urandom(16).hex()  
     new_user = User(username=username, secret=secret)
     db.session.add(new_user)
     db.session.commit()
@@ -31,7 +31,7 @@ def generate_otp():
         username = request.form['username']
         user = User.query.filter_by(username=username).first()
         if user:
-            passwords = user.generate_one_time_passwords(5)  # Генерація 5 паролів
+            passwords = user.generate_one_time_passwords(5)  
             flash(f'One-time passwords for {username}: {passwords}')
             return redirect(url_for('index'))
         flash('User not found.')
@@ -44,8 +44,7 @@ def authenticate():
     user = User.query.filter_by(username=username).first()
     
     if user:
-        # Генерація паролів для перевірки
-        passwords = user.generate_one_time_passwords(5)  # Генерація 5 паролів
+        passwords = user.generate_one_time_passwords(5)  
         if password in passwords:
             flash("Authenticated successfully!")
             return redirect(url_for('index'))
